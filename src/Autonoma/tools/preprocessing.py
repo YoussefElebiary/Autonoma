@@ -164,7 +164,7 @@ class PreprocessingTools:
             return {"error": f"Column {column} not found."}, df
         
         if method == 'onehot':
-            of = df.to_dummies(columns=[column], drop_first=True)
+            df = df.to_dummies(columns=[column], drop_first=True)
         elif method == 'label':
             df = df.with_columns(pl.col(column).cast(pl.Categorical).to_physical().alias(column))
         elif method == 'ordinal':
@@ -234,7 +234,7 @@ class PreprocessingTools:
         Example operation: {"type": "arithmetic", "col1": "age", "col2": "tenure", "op": "mul", "new_name": "age_tenure_interaction"}
         """
         for op in operations:
-            op_type = op.get('op')
+            op_type = op.get('type')
 
             try:
                 if op_type == 'arithmetic':

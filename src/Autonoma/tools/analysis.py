@@ -71,7 +71,7 @@ class AnalysisTools:
         if num_cols.width < 2:
             return {"error": "Insufficient Numerical Columns for Correlation"}
         
-        corr = df.corr()
+        corr = num_cols.corr()
         return {
             "matrix": corr.to_dicts(),
             "columns": num_cols.columns
@@ -89,4 +89,60 @@ class AnalysisTools:
         return {
             "skews": skews.to_dicts(),
             "columns": num_cols.columns
+        }
+    
+    @staticmethod
+    def get_target_correlations(df: pl.DataFrame, target: str) -> Dict[str, Any]:
+        if target not in df.columns:
+            return {"error": f"Column {target} not found."}
+
+        num_cols = df.select(cs.numeric())
+        
+        if target not in num_cols.columns:
+            return {"error": f"Target {target} must be numerical to calculate Pearson correlation."}
+            
+        if num_cols.width < 2:
+            return {"error": "Insufficient numerical columns for correlation."}
+
+        correlations = {}
+        for col in num_cols.columns:
+            if col != target:
+                corr_val = df.select(pl.corr(col, target)).item()
+                correlations[col] = corr_val
+
+        return {
+            "target": target,
+            "correlations": correlations
+        }
+
+    @staticmethod
+    def get_column_cardinality(df: pl.DataFrame, column: str) -> Dict[str, Any]:
+        if column not in df.columns:
+            return {"error": f"Column {column} not found."}
+
+        if df.schema[column] not in [pl.String, pl.Categorical]:
+            return {"error": "Cannot check cardinality for numerical/boolean column"}
+        
+        return {
+            "column": column,
+            "n_unique": df.get_column(column).n_unique()
+        }
+    
+    @staticmethod
+    def check_low_variance(df: pl.DataFrame, threshold: float = 0.95) -> Dict[str, Any]:
+        quasi_cols = []
+        quasi_scores = []
+        for col in df.columns:
+            counts_df = df.get_column(col).value_counts()
+            max_count = counts_df.get_column("count").max()
+            most_freq = max_count / df.height
+
+            if most_freq >= threshold:
+                quasi_cols.append(col)
+                quasi_scores.append(most_freq)
+
+        return {
+            "quasi_cols": quasi_cols,
+            "quasi_scores": quasi_scores,
+            "threshold": threshold
         }

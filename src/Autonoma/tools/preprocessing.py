@@ -175,7 +175,7 @@ class PreprocessingTools:
             if target_col is None:
                 return {"error": "Missing required parameter target_col with method = target"}, df
             tar = TargetEncoder()
-            encoded = tar.fit_transform(df.select(column).to_numpy(), df.select(target_col).to_numpy())
+            encoded = tar.fit_transform(df.select(column).to_numpy(), df.get_column(target_col).to_numpy())
             df = df.with_columns(pl.Series(column, encoded.flatten()))
         elif method == 'custom':
             if custom_map is None:

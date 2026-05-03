@@ -54,7 +54,7 @@ class ModellingTools:
         return path
 
     @staticmethod
-    def _get_estimator(model_type: str) -> BaseEstimator:
+    def __get_estimator(model_type: str) -> BaseEstimator:
         models = {
             'linear': LinearRegression,
             'logistic': LogisticRegression,
@@ -81,7 +81,7 @@ class ModellingTools:
         folds: int = 5
     ) -> Dict[str, Any]:
         grid = GridSearchCV(
-            estimator=ModellingTools._get_estimator(model_type),
+            estimator=ModellingTools.__get_estimator(model_type),
             param_grid=params,
             n_jobs=-1,
             cv=folds
@@ -102,7 +102,7 @@ class ModellingTools:
         iters: int = 100
     ) -> Dict[str, Any]:
         randomized = RandomizedSearchCV(
-            estimator=ModellingTools._get_estimator(model_type),
+            estimator=ModellingTools.__get_estimator(model_type),
             param_distributions=params,
             n_jobs=-1,
             cv=folds,

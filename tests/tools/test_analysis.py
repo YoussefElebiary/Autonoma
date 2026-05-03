@@ -151,7 +151,7 @@ class TestGetSkew:
 
 class TestGetTargetCorrelations:
     def test_normal_target(self, sample_df):
-        result = AnalysisTools.get_target_correlations(sample_df, target="age")
+        result = AnalysisTools.get_target_correlation(sample_df, target="age")
         assert "error" not in result
         assert result["target"] == "age"
         assert "id" in result["correlations"]
@@ -159,18 +159,18 @@ class TestGetTargetCorrelations:
         assert "age" not in result["correlations"]
 
     def test_target_not_found(self, sample_df):
-        result = AnalysisTools.get_target_correlations(sample_df, target="non_existent")
+        result = AnalysisTools.get_target_correlation(sample_df, target="non_existent")
         assert "error" in result
         assert "not found" in result["error"]
 
     def test_target_not_numerical(self, sample_df):
-        result = AnalysisTools.get_target_correlations(sample_df, target="category")
+        result = AnalysisTools.get_target_correlation(sample_df, target="category")
         assert "error" in result
         assert "must be numerical" in result["error"]
 
     def test_insufficient_columns(self):
         df = pl.DataFrame({"target": [1, 2, 3], "cat": ["A", "B", "C"]})
-        result = AnalysisTools.get_target_correlations(df, target="target")
+        result = AnalysisTools.get_target_correlation(df, target="target")
         assert "error" in result
         assert "Insufficient numerical columns" in result["error"]
 

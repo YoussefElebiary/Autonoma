@@ -46,7 +46,7 @@ class ModellingTools:
     MODEL_DIR = "models"
     os.makedirs(MODEL_DIR, exist_ok=True)
     @staticmethod
-    def __save_model(model: Any, model_type: str) -> str:
+    def save_model(model: Any, model_type: str) -> str:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         filename = f"{model_type}_{timestamp}.joblib"
         path = os.path.join(ModellingTools.MODEL_DIR, filename)
@@ -54,7 +54,7 @@ class ModellingTools:
         return path
 
     @staticmethod
-    def __get_estimator(model_type: str) -> BaseEstimator:
+    def get_estimator(model_type: str) -> BaseEstimator:
         models = {
             'linear': LinearRegression,
             'logistic': LogisticRegression,
@@ -81,7 +81,7 @@ class ModellingTools:
         folds: int = 5
     ) -> Dict[str, Any]:
         grid = GridSearchCV(
-            estimator=ModellingTools.__get_estimator(model_type),
+            estimator=ModellingTools.get_estimator(model_type),
             param_grid=params,
             n_jobs=-1,
             cv=folds
@@ -102,7 +102,7 @@ class ModellingTools:
         iters: int = 100
     ) -> Dict[str, Any]:
         randomized = RandomizedSearchCV(
-            estimator=ModellingTools.__get_estimator(model_type),
+            estimator=ModellingTools.get_estimator(model_type),
             param_distributions=params,
             n_jobs=-1,
             cv=folds,
@@ -133,7 +133,7 @@ class ModellingTools:
         if fit:
             estimator.fit(X_train.to_numpy(), y_train.to_numpy())
         return {
-            "model_path": ModellingTools.__save_model(estimator, model),
+            "model_path": ModellingTools.save_model(estimator, model),
         }
     
     @staticmethod
@@ -168,7 +168,7 @@ class ModellingTools:
             else:
                 estimator.fit(X_train.to_numpy(), y_train.to_numpy())
         return {
-            "model_path": ModellingTools.__save_model(estimator, model),
+            "model_path": ModellingTools.save_model(estimator, model),
         }
     
     @staticmethod

@@ -31,15 +31,15 @@ def reg_data():
 
 class TestGetEstimator:
     def test_valid_estimators(self):
-        est = ModellingTools._get_estimator('logistic')
+        est = ModellingTools.get_estimator('logistic')
         assert isinstance(est, LogisticRegression)
         
-        est2 = ModellingTools._get_estimator('ridge')
+        est2 = ModellingTools.get_estimator('ridge')
         assert isinstance(est2, Ridge)
 
     def test_invalid_estimator(self):
         with pytest.raises(ValueError, match="Invalid model_type"):
-            ModellingTools._get_estimator('invalid_model')
+            ModellingTools.get_estimator('invalid_model')
 
 class TestGridSearch:
     def test_grid_search_classification(self, cls_data):
@@ -143,14 +143,14 @@ class TestEvaluation:
         X, y = cls_data
         # Train RidgeClassifier (no predict_proba) to test edge case
         model = Ridge().fit(X.to_numpy(), y.to_numpy())
-        path = ModellingTools._ModellingTools__save_model(model, 'ridge_cls')
+        path = ModellingTools.save_model(model, 'ridge_cls')
         
         # Wait, standard Ridge is for regression. 
         # But we can just use the Regression model to predict float and see it crash, or just mock predict_proba.
         # Actually, let's just train an SVM without probability=True (not exposed in simple modeling.py but we can instantiate it).
         from sklearn.svm import SVC
         svc = SVC(probability=False).fit(X.to_numpy(), y.to_numpy())
-        svc_path = ModellingTools._ModellingTools__save_model(svc, 'svc')
+        svc_path = ModellingTools.save_model(svc, 'svc')
         
         res = ModellingTools.eval_classification(svc_path, X, y)
         assert "accuracy" in res

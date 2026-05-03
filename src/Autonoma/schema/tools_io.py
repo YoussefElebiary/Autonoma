@@ -30,7 +30,7 @@ class GetNumericalSummarySchema(BaseModel):
         description="List of the numerical columns to summarize. If None, all columns are analyzed."
     )
 
-class GetCategoricalSummarySchema(BaseModel):
+class GetCategoricalDistributionSchema(BaseModel):
     """
     Analyzes a categorical (string/object) column, returning the most 
     frequent values and their percentage of the total data.

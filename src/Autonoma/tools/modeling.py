@@ -77,7 +77,7 @@ class ModellingTools:
         model_type: str,
         params: Dict[str, Any],
         X_train: pl.DataFrame,
-        y_train: pl.Series,
+        y_train: pl.DataFrame,
         folds: int = 5
     ) -> Dict[str, Any]:
         grid = GridSearchCV(
@@ -97,7 +97,7 @@ class ModellingTools:
         model_type: str,
         params: Dict[str, Any],
         X_train: pl.DataFrame,
-        y_train: pl.Series,
+        y_train: pl.DataFrame,
         folds: int = 5,
         iters: int = 100
     ) -> Dict[str, Any]:
@@ -118,7 +118,7 @@ class ModellingTools:
     def linear_models(
         model: Literal['linear', 'logistic', 'lasso', 'ridge', 'elastic'],
         X_train: pl.DataFrame,
-        y_train: pl.Series,
+        y_train: pl.DataFrame,
         params: Dict[str, Any],
         fit: bool = True
     ) -> Dict[str, Any]:
@@ -140,9 +140,9 @@ class ModellingTools:
     def tree_models(
         model: Literal['decision_c', 'decision_r', 'forest_c', 'forest_r', 'xgb_c', 'xgb_r'],
         X_train: pl.DataFrame,
-        y_train: pl.Series,
+        y_train: pl.DataFrame,
         X_val: Optional[pl.DataFrame],
-        y_val: Optional[pl.Series],
+        y_val: Optional[pl.DataFrame],
         params: Dict[str, Any],
         fit: bool = True
     ) -> Dict[str, Any]:
@@ -175,7 +175,7 @@ class ModellingTools:
     def eval_classification(
         model_path: str,
         X_test: pl.DataFrame,
-        y_test: pl.Series,
+        y_test: pl.DataFrame,
     ) -> Dict[str, Any]:
         model = joblib.load(model_path)
         y_hat = model.predict(X_test.to_numpy())
@@ -204,7 +204,7 @@ class ModellingTools:
     def eval_regression(
         model_path: str,
         X_test: pl.DataFrame,
-        y_test: pl.Series,
+        y_test: pl.DataFrame,
     ) -> Dict[str, Any]:
         model = joblib.load(model_path)
         y_hat = model.predict(X_test.to_numpy())

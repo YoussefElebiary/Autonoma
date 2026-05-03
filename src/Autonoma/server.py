@@ -122,5 +122,96 @@ def check_low_variance(params: CheckLowVarianceSchema) -> str:
     return str(AnalysisTools.check_low_variance(STATE['df'], **params.model_dump()))
 #############################
 
+
+
+#############################
+#    PREPROCESSING TOOLS    #
+#############################
+@mcp.tool()
+def drop_column(params: DropColumnSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+
+    res, STATE['df'] = PreprocessingTools.drop_column(STATE['df'], **params.model_dump())
+    return str(res)
+
+@mcp.tool()
+def fill_nulls(params: FillNullsSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, STATE['df'] = PreprocessingTools.fill_nulls(STATE['df'], **params.model_dump())
+    return str(res)
+
+@mcp.tool()
+def drop_outliers(params: DropOutliersSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, STATE['df'] = PreprocessingTools.drop_outliers(STATE['df'], **params.model_dump())
+    return str(res)
+
+@mcp.tool()
+def transform_column(params: TransformColumnSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, STATE['df'] = PreprocessingTools.transform_column(STATE['df'], **params.model_dump())
+    return str(res)
+
+@mcp.tool()
+def scale_column(params: ScaleColumnSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    if STATE['X_train'] is not None and STATE['X_test'] is not None:
+        res, STATE['X_train'], STATE['X_test'] = PreprocessingTools.scale_column(STATE['X_train'], STATE['X_test'], **params.model_dump())
+        return str(res)
+    else:
+        return "Data has not been split. Use 'split_data' first"
+    
+@mcp.tool()
+def encode_categorical(params: EncodeCategoricalSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, STATE['df'] = PreprocessingTools.encode_categorical(STATE['df'], **params.model_dump())
+    return str(res)
+
+@mcp.tool()
+def split_data(params: SplitDataSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, train, val, test = PreprocessingTools.split_data(STATE['df'], **params.model_dump())
+    
+    target = params.target
+    STATE['X_train'] = train.drop(target)
+    STATE['y_train'] = train.select(target)
+    STATE['X_val'] = val.drop(target)
+    STATE['y_val'] = val.select(target)
+    if test is not None:
+        STATE['X_test'] = test.drop(target)
+        STATE['y_test'] = test.select(target)
+    else:
+        STATE['X_test'] = None
+        STATE['y_test'] = None
+        
+    msg = f"{res['success']}. "
+    msg += f"Train: {STATE['X_train'].shape}, Val: {STATE['X_val'].shape}"
+    if STATE['X_test'] is not None:
+        msg += f", Test: {STATE['X_test'].shape}"
+    
+    return msg
+
+@mcp.tool()
+def create_feature(params: CreateFeatureSchema) -> str:
+    if STATE['df'] is None:
+        return "No Data Loaded. Use 'init_state' first"
+    
+    res, STATE['df'] = PreprocessingTools.create_feature(STATE['df'], **params.model_dump())
+    return str(res)
+#############################
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")

@@ -92,7 +92,7 @@ class AnalysisTools:
         }
     
     @staticmethod
-    def get_target_correlations(df: pl.DataFrame, target: str) -> Dict[str, Any]:
+    def get_target_correlation(df: pl.DataFrame, target: str) -> Dict[str, Any]:
         if target not in df.columns:
             return {"error": f"Column {target} not found."}
 

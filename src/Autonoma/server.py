@@ -43,7 +43,8 @@ STATE: Dict[str, Optional[pl.DataFrame]] = {
     "X_val": None,
     "y_val": None,
     "X_test": None,
-    "y_test": None
+    "y_test": None,
+    "model_path": ""
 }
 
 def init_state(file_path: str) -> None:
@@ -212,6 +213,68 @@ def create_feature(params: CreateFeatureSchema) -> str:
     res, STATE['df'] = PreprocessingTools.create_feature(STATE['df'], **params.model_dump())
     return str(res)
 #############################
+
+
+
+#############################
+#      MODELING TOOLS       #
+#############################
+@mcp.tool()
+def grid_search(params: GridSearchSchema) -> str:
+    if STATE['X_train'] is not None and STATE['y_train'] is not None:
+        return str(ModellingTools.grid_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
+    else:
+        return "Train dataset is not yet split. Use 'split_data' first"
+    
+@mcp.tool()
+def random_search(params: RandomSearchSchema) -> str:
+    if STATE['X_train'] is not None and STATE['y_train'] is not None:
+        return str(ModellingTools.random_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
+    else:
+        return "Train dataset is not yet split. Use 'split_data' first"
+
+@mcp.tool()
+def linear_models(params: LinearModelsSchema) -> str:
+    if STATE['X_train'] is not None and STATE['y_train'] is not None:
+        res = ModellingTools.linear_models(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump())
+        STATE['model_path'] = res['model_path']
+        return str(res)
+    else:
+        return "Train dataset is not yet split. Use 'split_data' first"
+
+@mcp.tool()
+def tree_models(params: TreeModelsSchema) -> str:
+    if STATE['X_train'] is not None and STATE['y_train'] is not None:
+        res = ModellingTools.tree_models(
+            X_train=STATE['X_train'],
+            y_train=STATE['y_train'],
+            X_val=STATE['X_val'],
+            y_val=STATE['y_val'],
+            **params.model_dump()
+        )
+        STATE['model_path'] = res['model_path']
+        return str(res)
+    else:
+        return "Train dataset is not yet split. Use 'split_data' first"
+
+@mcp.tool()
+def eval_classification(params: EvalClassificationSchema) -> str:
+    if STATE['X_test'] is not None and STATE['y_test'] is not None:
+        return str(ModellingTools.eval_classification(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
+    elif STATE['X_val'] is not None and STATE['y_val'] is not None:
+        return str(ModellingTools.eval_classification(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
+    else:
+        return "Test dataset is not yet split. Use 'split_data' first"
+
+@mcp.tool()
+def eval_regression(params: EvalRegressionSchema) -> str:
+    if STATE['X_test'] is not None and STATE['y_test'] is not None:
+        return str(ModellingTools.eval_regression(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
+    elif STATE['X_val'] is not None and STATE['y_val'] is not None:
+        return str(ModellingTools.eval_regression(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
+    else:
+        return "Test dataset is not yet split. Use 'split_data' first"
+############################
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")

@@ -241,5 +241,100 @@ class CreateFeatureSchema(BaseModel):
 #############################
 #         MODELING          #
 #############################
+class GridSearchSchema(BaseModel):
+    """
+    Performs exhaustive Grid Search to find the best hyperparameters.
+    Use this when the hyperparameter search space is relatively small.
+    """
+    model_type: Literal['logistic', 'lasso', 'ridge', 'elastic', 'decision_c', 'decision_r', 'forest_c', 'forest_r', 'xgb_c', 'xgb_r'] = Field(
+        ...,
+        description="The identifier of the base model to tune."
+    )
+    params: Dict[str, List[Any]] = Field(
+        ...,
+        description="Hyperparameter search space. MUST be lists of values. Example: {'max_depth': [3, 5, 7], 'n_estimators': [50, 100]}."
+    )
+    folds: int = Field(
+        default=5,
+        description="The number of cross-validation folds."
+    )
 
+class RandomSearchSchema(BaseModel):
+    """
+    Performs Randomized Search for hyperparameter tuning.
+    Use this when the search space is massive or computational time is limited.
+    """
+    model_type: Literal['logistic', 'lasso', 'ridge', 'elastic', 'decision_c', 'decision_r', 'forest_c', 'forest_r', 'xgb_c', 'xgb_r'] = Field(
+        ...,
+        description="The identifier of the base model to tune."
+    )
+    params: Dict[str, List[Any]] = Field(
+        ...,
+        description="Hyperparameter search distributions. MUST be lists of values."
+    )
+    folds: int = Field(
+        default=5,
+        description="The number of cross-validation folds."
+    )
+    iters: int = Field(
+        default=100,
+        description="The number of randomized combinations to try."
+    )
+
+class LinearModelsSchema(BaseModel):
+    """
+    Trains a linear algorithm. 
+    Use this for simple datasets or when high interpretability is required.
+    """
+    model: Literal['linear', 'logistic', 'lasso', 'ridge', 'elastic'] = Field(
+        ...,
+        description="The name of the linear model."
+    )
+    params: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="A dictionary of specific hyperparameter values (e.g., {'alpha': 1.0})."
+    )
+    fit: bool = Field(
+        default=True,
+        description="Whether to fit the model immediately."
+    )
+
+class TreeModelsSchema(BaseModel):
+    """
+    Trains a tree-based or ensemble algorithm. 
+    Use this for complex, non-linear relationships. 
+    Models ending in 'c' are for classification; 'r' are for regression.
+    """
+    model: Literal['decision_c', 'decision_r', 'forest_c', 'forest_r', 'xgb_c', 'xgb_r'] = Field(
+        ...,
+        description="The name of the tree-based model to train."
+    )
+    params: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="A dictionary of specific hyperparameter values (e.g., {'max_depth': 5})."
+    )
+    fit: bool = Field(
+        default=True,
+        description="Whether to fit the model immediately."
+    )
+
+class EvalClassificationSchema(BaseModel):
+    """
+    Evaluates a trained classification model on unseen test data.
+    MUST be called after a classification model is successfully trained.
+    """
+    model_path: str = Field(
+        ...,
+        description="The filepath of the saved model artifact, returned by the training tool."
+    )
+
+class EvalRegressionSchema(BaseModel):
+    """
+    Evaluates a trained regression model on unseen test data using MSE, RMSE, and MAE.
+    MUST be called after a regression model is successfully trained.
+    """
+    model_path: str = Field(
+        ...,
+        description="The filepath of the saved model artifact, returned by the training tool."
+    )
 #############################

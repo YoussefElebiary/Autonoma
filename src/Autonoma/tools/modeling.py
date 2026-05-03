@@ -54,15 +54,34 @@ class ModellingTools:
         return path
 
     @staticmethod
+    def _get_estimator(model_type: str) -> BaseEstimator:
+        models = {
+            'linear': LinearRegression,
+            'logistic': LogisticRegression,
+            'lasso': Lasso,
+            'ridge': Ridge,
+            'elastic': ElasticNet,
+            'decision_c': DecisionTreeClassifier,
+            'decision_r': DecisionTreeRegressor,
+            'forest_c': RandomForestClassifier,
+            'forest_r': RandomForestRegressor,
+            'xgb_c': XGBClassifier,
+            'xgb_r': XGBRegressor
+        }
+        if model_type not in models:
+            raise ValueError(f"Invalid model_type: {model_type}")
+        return models[model_type]()
+
+    @staticmethod
     def grid_search(
-        model: BaseEstimator,
+        model_type: str,
         params: Dict[str, Any],
         X_train: pl.DataFrame,
         y_train: pl.Series,
         folds: int = 5
     ) -> Dict[str, Any]:
         grid = GridSearchCV(
-            estimator=model,
+            estimator=ModellingTools._get_estimator(model_type),
             param_grid=params,
             n_jobs=-1,
             cv=folds
@@ -75,7 +94,7 @@ class ModellingTools:
     
     @staticmethod
     def random_search(
-        model: BaseEstimator,
+        model_type: str,
         params: Dict[str, Any],
         X_train: pl.DataFrame,
         y_train: pl.Series,
@@ -83,7 +102,7 @@ class ModellingTools:
         iters: int = 100
     ) -> Dict[str, Any]:
         randomized = RandomizedSearchCV(
-            estimator=model,
+            estimator=ModellingTools._get_estimator(model_type),
             param_distributions=params,
             n_jobs=-1,
             cv=folds,
@@ -142,9 +161,9 @@ class ModellingTools:
         if fit:
             if X_val is not None and y_val is not None and 'xgb' in model:
                 estimator.fit(
-                    X_train,
-                    y_train,
-                    eval_set = [(X_val, y_val)],
+                    X_train.to_numpy(),
+                    y_train.to_numpy(),
+                    eval_set = [(X_val.to_numpy(), y_val.to_numpy())],
                 )
             else:
                 estimator.fit(X_train.to_numpy(), y_train.to_numpy())
@@ -164,7 +183,7 @@ class ModellingTools:
         roc_auc = None
         try:
             if hasattr(model, "predict_proba"):
-                y_prob = model.predict_proba(X_test)
+                y_prob = model.predict_proba(X_test.to_numpy())
                 if y_prob.shape[1] == 2:
                     roc_auc = roc_auc_score(y_test_np, y_prob[:, 1])
                 else:

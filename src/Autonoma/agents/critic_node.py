@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
-from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE, MAX_CRITIC_ITERATIONS
+from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE, MAX_CRITIC_ITERATIONS, debug_print
 
 def init_prompt(path: str) -> str:
     full_path = Path(__file__).parent.parent / "prompts" / path
@@ -22,11 +22,11 @@ def critic_agent_node(state: AutonomaState) -> dict:
     """The node responsible for providing feedback and routing decisions."""
 
     current_agent = state.get("current_agent", "unknown")
-    print(f"--- CRITIQUE: Reviewing {current_agent.upper()} Agent ---")
+    debug_print(f"--- CRITIQUE: Reviewing {current_agent.upper()} Agent ---")
 
     critic_iterations = state.get("critic_iterations", 0)
     if critic_iterations >= MAX_CRITIC_ITERATIONS:
-        print("-> Max critic iterations reached. Forcing approval.")
+        debug_print("-> Max critic iterations reached. Forcing approval.")
         return {
             "final_decision": "approve",
             "critic_iterations": 0
@@ -67,7 +67,7 @@ def critic_agent_node(state: AutonomaState) -> dict:
 
         new_iters = 0 if decision == 'approve' else critic_iterations + 1
         
-        print(f"-> Decision: {decision.upper()} (Iteration {new_iters}/{MAX_CRITIC_ITERATIONS})")
+        debug_print(f"-> Decision: {decision.upper()} (Iteration {new_iters}/{MAX_CRITIC_ITERATIONS})")
 
         return {
             "critic_feedback": feedback,
@@ -75,7 +75,7 @@ def critic_agent_node(state: AutonomaState) -> dict:
             "critic_iterations": new_iters
         }
     except json.JSONDecodeError:
-        print("-> Critic output invalid JSON. Forcing approval to unblock pipeline.")
+        debug_print("-> Critic output invalid JSON. Forcing approval to unblock pipeline.")
         return {
             "critic_feedback": "None",
             "final_decision": "approve",

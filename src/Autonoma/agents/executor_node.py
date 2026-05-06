@@ -1,10 +1,11 @@
 import json
 import re
 from ..graph.state import AutonomaState
+from ..config import debug_print
 
 async def executor_node(state: AutonomaState) -> dict:
     current_agent = state.get("current_agent", "unknown")
-    print(f"--- EXECUTING TOOLS FOR: {current_agent.upper()} ---")
+    debug_print(f"--- EXECUTING TOOLS FOR: {current_agent.upper()} ---")
 
     sample_output = state.get("sample_output", "[]")
     session = state.get("mcp_session")
@@ -19,7 +20,7 @@ async def executor_node(state: AutonomaState) -> dict:
         for call in tool_calls:
             tool_name = call.get("tool_name")
             params = call.get("params", {})
-            print(f"-> Running {tool_name} with params: {params}")
+            debug_print(f"-> Running {tool_name} with params: {params}")
 
             result = await session.call_tool(tool_name, arguments={"params": params})
             
@@ -32,7 +33,7 @@ async def executor_node(state: AutonomaState) -> dict:
                     if "model_path" in result_data:
                         model_path = result_data["model_path"]
                 except json.JSONDecodeError:
-                    print(f"-> Warning: Could not parse model_path from: {result_text}")
+                    debug_print(f"-> Warning: Could not parse model_path from: {result_text}")
 
         formatted_result = "\n\n".join(observations)
 
@@ -51,10 +52,10 @@ async def executor_node(state: AutonomaState) -> dict:
         else:
             return {}
     except json.JSONDecodeError:
-        print("-> Executor failed to parse JSON.")
+        debug_print("-> Executor failed to parse JSON.")
         return {}
     except Exception as e:
-        print(f"-> MCP Execution Error: {str(e)}")
+        debug_print(f"-> MCP Execution Error: {str(e)}")
         error_msg = f"TOOL EXECUTION FAILED with error: {str(e)}"
         
         if current_agent == 'analysis':

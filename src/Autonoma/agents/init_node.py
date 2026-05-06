@@ -1,26 +1,27 @@
 import json
+from ..config import debug_print
 from ..graph.state import AutonomaState
 
 async def init_agent_node(state: AutonomaState) -> dict:
-    print("--- PIPELINE START: INITIALIZING DATA ---")
+    debug_print("--- PIPELINE START: INITIALIZING DATA ---")
     
     csv_path = state.get("csv_path", "data.csv") 
     session = state.get("mcp_session")
     
     try:
-        print(f"-> Loading CSV: {csv_path}")
+        debug_print(f"-> Loading CSV: {csv_path}")
         init_res = await session.call_tool("init_state", arguments={"params": {"file_path": csv_path}})
         init_text = init_res.content[0].text
-        print(f"-> Init Result: {init_text}")
+        debug_print(f"-> Init Result: {init_text}")
         if "Error" in init_text or "Field required" in init_text:
             raise Exception(f"Failed to initialize state: {init_text}")
 
-        print("-> Fetching Data Summary...")
+        debug_print("-> Fetching Data Summary...")
         info_result = await session.call_tool("get_df_info", arguments={})
         
         data_summary = info_result.content[0].text
 
-        print("-> Fetching Tool Schemas...")
+        debug_print("-> Fetching Tool Schemas...")
         tools_list = await session.list_tools()
         
         analysis_tools = ["get_df_info", "get_numerical_summary", "get_categorical_distribution", "detect_outliers", "get_correlation", "get_skew", "get_target_correlations", "get_column_cardinality", "check_low_variance"]
@@ -74,7 +75,7 @@ async def init_agent_node(state: AutonomaState) -> dict:
             "critic_feedback": "None"
         }
     except Exception as e:
-        print(f"-> Initialization Error: {e}")
+        debug_print(f"-> Initialization Error: {e}")
         return {
             "data_summary": f"FAILED TO LOAD DATA: {str(e)}",
             "tool_schemas": "FAILED TO LOAD SCHEMAS",

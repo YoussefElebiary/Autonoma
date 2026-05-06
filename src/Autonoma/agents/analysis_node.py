@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
-from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE
+from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE, debug_print
 
 def init_prompt(path: str) -> str:
     full_path = Path(__file__).parent.parent / "prompts" / path
@@ -20,7 +20,7 @@ llm = ChatOpenAI(
 def analysis_agent_node(state: AutonomaState) -> dict:
     """The node responsible for reading the raw data summary and outputting insights."""
 
-    print("--- Performing EDA ---")
+    debug_print("--- Performing EDA ---")
     data_summary = state.get("data_summary", "No data summary provided.")
     critic_feedback = state.get("critic_feedback", "None")
     try:

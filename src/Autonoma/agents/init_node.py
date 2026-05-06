@@ -1,7 +1,7 @@
 import json
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
-from Autonoma.graph.state import AutonomaState
+from ..graph.state import AutonomaState
 
 server_params = StdioServerParameters(
     command="python",

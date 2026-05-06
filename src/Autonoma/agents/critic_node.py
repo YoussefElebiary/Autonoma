@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from langchain_openai import ChatOpenAI
-from Autonoma.graph.state import AutonomaState
+from ..graph.state import AutonomaState
 
 def init_prompt(path: str) -> str:
     full_path = Path(__file__).parent.parent / "prompts" / path

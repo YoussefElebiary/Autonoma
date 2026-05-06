@@ -1,12 +1,12 @@
 from langgraph.graph import StateGraph, END
-from Autonoma.graph.state import AutonomaState
+from .state import AutonomaState
 
-from Autonoma.agents.init_node impoty init_agent_node
-from Autonoma.agents.analysis_node import analysis_agent_node
-from Autonoma.agents.preprocessing_node import preprocessing_agent_node
-from Autonoma.agents.modeling_node import modeling_agent_node
-from Autonoma.agents.critic_node import critic_agent_node
-from Autonoma.agents.executor_node import executor_node
+from ..agents.init_node import init_agent_node
+from ..agents.analysis_node import analysis_agent_node
+from ..agents.preprocessing_node import preprocessing_agent_node
+from ..agents.modeling_node import modeling_agent_node
+from ..agents.critic_node import critic_agent_node
+from ..agents.executor_node import executor_node
 
 def route_from_critic(state: AutonomaState) -> str:
     """Reads the final_decision and routes to the Executor or back to the Agent."""

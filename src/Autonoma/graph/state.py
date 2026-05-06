@@ -6,6 +6,8 @@ class AutonomaState(TypedDict):
 
     # Summary of the DataFrame info returned by the MCP
     data_summary: str
+    # Schemas for the available MCP tools
+    tool_schemas: str
     # EDA Insights returned by the Analysis Agent
     eda_insights: str
     # Preprocessing steps approved by critic

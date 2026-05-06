@@ -31,7 +31,7 @@ OUTPUT FORMAT:
 You MUST output an array of JSON objects. Do not include markdown formatting, backticks, or conversational text. Your entire response must be parsable by Python's json.loads().
 
 Example:
-[[
+[
   {{
     "tool_name": "tree_models",
     "params": {{
@@ -43,4 +43,4 @@ Example:
         "fit": true
     }}
   }}
-]]
+]

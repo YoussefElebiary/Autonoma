@@ -38,6 +38,6 @@ def modeling_agent_node(state: AutonomaState) -> dict:
     response = llm.invoke(prompt)
 
     return {
-        "draft_output": response.content,
+        "sample_output": response.content,
         "current_agent": "modeling" 
     }

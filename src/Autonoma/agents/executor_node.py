@@ -17,22 +17,22 @@ async def executor_node(state: AutonomaState) -> dict:
         model_path = ""
 
         for call in tool_calls:
-                    tool_name = call.get("tool_name")
-                    params = call.get("params", {})
-                    print(f"-> Running {tool_name} with params: {params}")
+            tool_name = call.get("tool_name")
+            params = call.get("params", {})
+            print(f"-> Running {tool_name} with params: {params}")
 
-                    result = await session.call_tool(tool_name, arguments=params)
+            result = await session.call_tool(tool_name, arguments={"params": params})
+            
+            result_text = result.content[0].text
+            observations.append(f"Result of {tool_name}:\n{result_text}")
 
-                    result_text = result.content[0].text
-                    observations.append(f"Result of {tool_name}:\n{result_text}")
-
-                    if current_agent == 'modeling':
-                        try:
-                            result_data = json.loads(result_text)
-                            if "model_path" in result_data:
-                                model_path = result_data["model_path"]
-                        except json.JSONDecodeError:
-                            print(f"-> Warning: Could not parse model_path from: {result_text}")
+            if current_agent == 'modeling':
+                try:
+                    result_data = json.loads(result_text)
+                    if "model_path" in result_data:
+                        model_path = result_data["model_path"]
+                except json.JSONDecodeError:
+                    print(f"-> Warning: Could not parse model_path from: {result_text}")
 
         formatted_result = "\n\n".join(observations)
 

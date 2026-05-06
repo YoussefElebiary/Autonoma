@@ -9,7 +9,11 @@ async def init_agent_node(state: AutonomaState) -> dict:
     
     try:
         print(f"-> Loading CSV: {csv_path}")
-        await session.call_tool("init_state", arguments={"file_path": csv_path})
+        init_res = await session.call_tool("init_state", arguments={"params": {"file_path": csv_path}})
+        init_text = init_res.content[0].text
+        print(f"-> Init Result: {init_text}")
+        if "Error" in init_text or "Field required" in init_text:
+            raise Exception(f"Failed to initialize state: {init_text}")
 
         print("-> Fetching Data Summary...")
         info_result = await session.call_tool("get_df_info", arguments={})
@@ -21,7 +25,17 @@ async def init_agent_node(state: AutonomaState) -> dict:
         
         schemas = []
         for t in tools_list.tools:
-            props = t.inputSchema.get("properties", {})
+            if t.name == "init_state":
+                continue
+            
+            defs = t.inputSchema.get("$defs", {})
+            schema_keys = list(defs.keys())
+            if schema_keys:
+                actual_schema = defs[schema_keys[0]]
+                props = actual_schema.get("properties", {})
+            else:
+                props = t.inputSchema.get("properties", {})
+                
             simple_schema = {k: v.get("type", "any") for k, v in props.items()}
             schemas.append({
                 "name": t.name,

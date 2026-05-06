@@ -3,17 +3,19 @@ import re
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
+from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE, MAX_CRITIC_ITERATIONS
 
 def init_prompt(path: str) -> str:
     full_path = Path(__file__).parent.parent / "prompts" / path
     with open(full_path, "r") as f:
         return f.read()
 
+
 llm = ChatOpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="lm-studio",
-    model="gemma-3-4b",
-    temperature=0.1
+    base_url=LLM_BASE_URL,
+    api_key=LLM_API_KEY,
+    model=LLM_MODEL,
+    temperature=LLM_TEMPERATURE
 )
 
 def critic_agent_node(state: AutonomaState) -> dict:
@@ -23,7 +25,7 @@ def critic_agent_node(state: AutonomaState) -> dict:
     print(f"--- CRITIQUE: Reviewing {current_agent.upper()} Agent ---")
 
     critic_iterations = state.get("critic_iterations", 0)
-    if critic_iterations >= 3:
+    if critic_iterations >= MAX_CRITIC_ITERATIONS:
         print("-> Max critic iterations reached. Forcing approval.")
         return {
             "final_decision": "approve",
@@ -65,7 +67,7 @@ def critic_agent_node(state: AutonomaState) -> dict:
 
         new_iters = 0 if decision == 'approve' else critic_iterations + 1
         
-        print(f"-> Decision: {decision.upper()} (Iteration {new_iters}/3)")
+        print(f"-> Decision: {decision.upper()} (Iteration {new_iters}/{MAX_CRITIC_ITERATIONS})")
 
         return {
             "critic_feedback": feedback,

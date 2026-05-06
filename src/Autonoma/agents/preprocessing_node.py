@@ -2,17 +2,19 @@ import json
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
+from ..config import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, LLM_TEMPERATURE
 
 def init_prompt(path: str) -> str:
     full_path = Path(__file__).parent.parent / "prompts" / path
     with open(full_path, "r") as f:
         return f.read()
 
+
 llm = ChatOpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="lm-studio",
-    model="gemma-3-4b",
-    temperature=0.1
+    base_url=LLM_BASE_URL,
+    api_key=LLM_API_KEY,
+    model=LLM_MODEL,
+    temperature=LLM_TEMPERATURE
 )
 
 def preprocessing_agent_node(state: AutonomaState) -> dict:

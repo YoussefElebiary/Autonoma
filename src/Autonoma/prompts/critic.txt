@@ -21,7 +21,7 @@ The {current_agent} Agent wants to execute the following tool call(s):
 You MUST output a single JSON object. Do not include markdown, backticks, or conversational text.
 
 Example format:
-{
+{{
   "feedback": "The action looks good, proceed with execution.",
   "decision": "approve"
-}
+}}

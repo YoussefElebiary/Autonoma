@@ -23,7 +23,7 @@ def modeling_agent_node(state: AutonomaState) -> dict:
     preprocessing_steps = state.get("preprocessing_steps", "No preprocessing was done.")
     critic_feedback = state.get("critic_feedback", "None")
     tool_schemas = state.get("tool_schemas", "No tools provided.")
-    current_model = state.get("model_path", "No current model exists.")
+    model_path = state.get("model_path", "No current model exists.")
 
     prompt_template = init_prompt("modeling.txt")
     prompt = prompt_template.format(
@@ -32,7 +32,7 @@ def modeling_agent_node(state: AutonomaState) -> dict:
         preprocessing_steps=preprocessing_steps,
         critic_feedback=critic_feedback,
         tool_schemas=tool_schemas,
-        current_model=current_model
+        model_path=model_path
     )
 
     response = llm.invoke(prompt)

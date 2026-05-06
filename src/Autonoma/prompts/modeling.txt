@@ -31,16 +31,16 @@ OUTPUT FORMAT:
 You MUST output an array of JSON objects. Do not include markdown formatting, backticks, or conversational text. Your entire response must be parsable by Python's json.loads().
 
 Example:
-[
-  {
+[[
+  {{
     "tool_name": "tree_models",
-    "params": {
+    "params": {{
         "model": "decision_c",
-        "params": {
+        "params": {{
             "max_depth": 5,
             "min_samples_leaf": 3
-        },
+        }},
         "fit": true
-    }
-  }
-]
+    }}
+  }}
+]]

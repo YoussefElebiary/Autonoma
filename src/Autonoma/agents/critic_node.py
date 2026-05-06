@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
@@ -48,7 +49,10 @@ def critic_agent_node(state: AutonomaState) -> dict:
 
     response = llm.invoke(prompt)
     try:
-        critic_decision = json.loads(response.content)
+        content = response.content
+        match = re.search(r'```(?:json)?\n(.*?)\n```', content, re.DOTALL)
+        clean_content = match.group(1).strip() if match else content.strip()
+        critic_decision = json.loads(clean_content)
         feedback = critic_decision.get("feedback", "Looks good.")
         decision = critic_decision.get("decision", "approve").lower()
 

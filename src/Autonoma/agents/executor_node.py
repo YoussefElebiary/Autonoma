@@ -1,4 +1,5 @@
 import json
+import re
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from ..graph.state import AutonomaState
@@ -15,7 +16,9 @@ async def executor_node(state: AutonomaState) -> dict:
     sample_output = state.get("sample_output", "[]")
 
     try:
-        tool_calls = json.loads(sample_output)
+        match = re.search(r'```(?:json)?\n(.*?)\n```', sample_output, re.DOTALL)
+        clean_output = match.group(1).strip() if match else sample_output.strip()
+        tool_calls = json.loads(clean_output)
         observations = []
         model_path = ""
 

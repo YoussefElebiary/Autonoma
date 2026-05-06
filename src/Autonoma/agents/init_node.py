@@ -45,7 +45,13 @@ async def init_agent_node(state: AutonomaState) -> dict:
             else:
                 props = t.inputSchema.get("properties", {})
                 
-            simple_schema = {k: v.get("type", "any") for k, v in props.items()}
+            simple_schema = {}
+            for k, v in props.items():
+                if "enum" in v:
+                    simple_schema[k] = f"enum: {v['enum']}"
+                else:
+                    simple_schema[k] = v.get("type", "any")
+                    
             tool_dict = {
                 "name": t.name,
                 "description": t.description,

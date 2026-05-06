@@ -37,6 +37,12 @@ def critic_agent_node(state: AutonomaState) -> dict:
     
     sample_output = state.get("sample_output", "[]")
 
+    try:
+        schemas_dict = json.loads(state.get("tool_schemas", "{}"))
+        current_agent_schemas = json.dumps(schemas_dict.get(current_agent, []), indent=2)
+    except json.JSONDecodeError:
+        current_agent_schemas = "No tools provided."
+
     prompt_template = init_prompt("critic.txt")
     prompt = prompt_template.format(
         current_agent=current_agent,
@@ -44,7 +50,8 @@ def critic_agent_node(state: AutonomaState) -> dict:
         eda_insights=eda_insights,
         preprocessing_steps=preprocessing_steps,
         current_model=current_model,
-        sample_output=sample_output
+        sample_output=sample_output,
+        current_agent_schemas=current_agent_schemas
     )
 
     response = llm.invoke(prompt)

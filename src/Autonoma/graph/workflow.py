@@ -43,7 +43,7 @@ def route_after_execution(state: AutonomaState) -> str:
 workflow = StateGraph(AutonomaState)
 
 # Add all nodes to the graph
-workflow.add_node("Initalizer", init_agent_node)
+workflow.add_node("Initializer", init_agent_node)
 workflow.add_node("Analysis", analysis_agent_node)
 workflow.add_node("Preprocessing", preprocessing_agent_node)
 workflow.add_node("Modeling", modeling_agent_node)
@@ -54,7 +54,7 @@ workflow.add_node("Executor", executor_node)
 workflow.set_entry_point("Initializer")
 
 # Connect the Initlaizer Node to Analysis Node
-workflow.add_edge("Initalizer", "Analysis")
+workflow.add_edge("Initializer", "Analysis")
 
 # Connect all agents to Critic
 workflow.add_edge("Analysis", "Critic")

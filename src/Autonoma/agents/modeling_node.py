@@ -14,7 +14,9 @@ llm = ChatOpenAI(
     base_url=LLM_BASE_URL,
     api_key=LLM_API_KEY,
     model=LLM_MODEL,
-    temperature=LLM_TEMPERATURE
+    temperature=LLM_TEMPERATURE,
+    max_retries=0,
+    timeout=30
 )
 
 def modeling_agent_node(state: AutonomaState) -> dict:

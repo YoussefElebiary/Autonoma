@@ -10,6 +10,18 @@ from typing import (
 
 
 #############################
+#        INIT STATE         #
+#############################
+class InitStateSchema(BaseModel):
+    file_path: str = Field(
+        ...,
+        description="The absolute or relative path to the CSV file to be loaded."
+    )
+#############################
+
+
+
+#############################
 #         ANALYSIS          #
 #############################
 class GetDFInfoSchema(BaseModel):

@@ -3,9 +3,14 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from ..graph.state import AutonomaState
 
+import os
+import sys
+
+server_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "server.py"))
+
 server_params = StdioServerParameters(
-    command="python",
-    args=["-m", "Autonoma.server"]
+    command=sys.executable,
+    args=[server_script]
 )
 
 async def init_agent_node(state: AutonomaState) -> dict:
@@ -26,8 +31,21 @@ async def init_agent_node(state: AutonomaState) -> dict:
                 
                 data_summary = info_result.content[0].text
 
+                print("-> Fetching Tool Schemas...")
+                tools_list = await session.list_tools()
+                
+                schemas = []
+                for t in tools_list.tools:
+                    schemas.append({
+                        "name": t.name,
+                        "description": t.description,
+                        "inputSchema": t.inputSchema
+                    })
+                tool_schemas = json.dumps(schemas, indent=2)
+
                 return {
                     "data_summary": data_summary,
+                    "tool_schemas": tool_schemas,
                     "critic_iterations": 0,
                     "critic_feedback": "None"
                 }
@@ -36,6 +54,7 @@ async def init_agent_node(state: AutonomaState) -> dict:
         print(f"-> Initialization Error: {e}")
         return {
             "data_summary": f"FAILED TO LOAD DATA: {str(e)}",
+            "tool_schemas": "FAILED TO LOAD SCHEMAS",
             "critic_iterations": 0,
             "critic_feedback": "None"
         }

@@ -4,9 +4,14 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from ..graph.state import AutonomaState
 
+import os
+import sys
+
+server_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "server.py"))
+
 server_params = StdioServerParameters(
-    command="python",
-    args=["-m", "Autonoma.server"]
+    command=sys.executable,
+    args=[server_script]
 )
 
 async def executor_node(state: AutonomaState) -> dict:

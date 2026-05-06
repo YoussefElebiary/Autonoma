@@ -1,24 +1,13 @@
 import json
 import re
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
 from ..graph.state import AutonomaState
-
-import os
-import sys
-
-server_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "server.py"))
-
-server_params = StdioServerParameters(
-    command=sys.executable,
-    args=[server_script]
-)
 
 async def executor_node(state: AutonomaState) -> dict:
     current_agent = state.get("current_agent", "unknown")
     print(f"--- EXECUTING TOOLS FOR: {current_agent.upper()} ---")
 
     sample_output = state.get("sample_output", "[]")
+    session = state.get("mcp_session")
 
     try:
         match = re.search(r'```(?:json)?\n(.*?)\n```', sample_output, re.DOTALL)
@@ -27,11 +16,7 @@ async def executor_node(state: AutonomaState) -> dict:
         observations = []
         model_path = ""
 
-        async with stdio_client(server_params) as (read, write):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-
-                for call in tool_calls:
+        for call in tool_calls:
                     tool_name = call.get("tool_name")
                     params = call.get("params", {})
                     print(f"-> Running {tool_name} with params: {params}")

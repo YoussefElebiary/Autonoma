@@ -21,7 +21,7 @@ from typing import (
 
 from mcp.server.fastmcp import FastMCP
 
-
+from Autonoma.tools.init import InitTools
 from Autonoma.tools.analysis import AnalysisTools
 from Autonoma.tools.preprocessing import PreprocessingTools
 from Autonoma.tools.modeling import ModellingTools
@@ -46,13 +46,17 @@ STATE: Dict[str, Optional[pl.DataFrame]] = {
     "y_test": None,
     "model_path": ""
 }
+#############################
 
-def init_state(file_path: str) -> None:
-    global STATE
-    df = pl.read_csv(file_path)
-    STATE['df'] = df
 
-init_state("D:\\Code\\Autonoma\\dirty_cafe_sales.csv")
+
+#############################
+#     INIT STATE TOOLS      #
+#############################
+@mcp.tool()
+def init_state(params: InitStateSchema) -> str:
+    return InitTools.init_state(params.file_path, STATE)
+
 #############################
 
 

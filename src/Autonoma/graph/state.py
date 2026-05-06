@@ -1,6 +1,9 @@
 from typing import TypedDict, Optional
 
 class AutonomaState(TypedDict):
+    # Dataset Path
+    csv_path: str
+
     # Summary of the DataFrame info returned by the MCP
     data_summary: str
     # EDA Insights returned by the Analysis Agent

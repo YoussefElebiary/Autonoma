@@ -65,7 +65,7 @@ def init_state(params: InitStateSchema) -> str:
 #      ANALYSIS TOOLS       #
 #############################
 @mcp.tool()
-def get_df_into() -> str:
+def get_df_info() -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     

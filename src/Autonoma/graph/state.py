@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, Any
 
 class AutonomaState(TypedDict):
     # Dataset Path
@@ -8,6 +8,8 @@ class AutonomaState(TypedDict):
     data_summary: str
     # Schemas for the available MCP tools
     tool_schemas: str
+    # MCP Session object
+    mcp_session: Any
     # EDA Insights returned by the Analysis Agent
     eda_insights: str
     # Preprocessing steps approved by critic

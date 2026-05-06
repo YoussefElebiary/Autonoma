@@ -23,7 +23,16 @@ async def init_agent_node(state: AutonomaState) -> dict:
         print("-> Fetching Tool Schemas...")
         tools_list = await session.list_tools()
         
-        schemas = []
+        analysis_tools = ["get_df_info", "get_numerical_summary", "get_categorical_distribution", "detect_outliers", "get_correlation", "get_skew", "get_target_correlations", "get_column_cardinality", "check_low_variance"]
+        preprocessing_tools = ["drop_column", "fill_nulls", "drop_outliers", "transform_column", "scale_column", "encode_categorical", "split_data", "create_feature"]
+        modeling_tools = ["grid_search", "random_search", "linear_models", "tree_models", "eval_classification", "eval_regression"]
+
+        schemas_dict = {
+            "analysis": [],
+            "preprocessing": [],
+            "modeling": []
+        }
+        
         for t in tools_list.tools:
             if t.name == "init_state":
                 continue
@@ -37,12 +46,20 @@ async def init_agent_node(state: AutonomaState) -> dict:
                 props = t.inputSchema.get("properties", {})
                 
             simple_schema = {k: v.get("type", "any") for k, v in props.items()}
-            schemas.append({
+            tool_dict = {
                 "name": t.name,
                 "description": t.description,
                 "inputSchema": simple_schema
-            })
-        tool_schemas = json.dumps(schemas, indent=2)
+            }
+
+            if t.name in analysis_tools:
+                schemas_dict["analysis"].append(tool_dict)
+            elif t.name in preprocessing_tools:
+                schemas_dict["preprocessing"].append(tool_dict)
+            elif t.name in modeling_tools:
+                schemas_dict["modeling"].append(tool_dict)
+                
+        tool_schemas = json.dumps(schemas_dict)
 
         return {
             "data_summary": data_summary,

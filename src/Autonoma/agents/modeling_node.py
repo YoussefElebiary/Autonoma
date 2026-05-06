@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from ..graph.state import AutonomaState
@@ -22,7 +23,11 @@ def modeling_agent_node(state: AutonomaState) -> dict:
     eda_insights = state.get("eda_insights", "No EDA insights provided.")
     preprocessing_steps = state.get("preprocessing_steps", "No preprocessing was done.")
     critic_feedback = state.get("critic_feedback", "None")
-    tool_schemas = state.get("tool_schemas", "No tools provided.")
+    try:
+        schemas_dict = json.loads(state.get("tool_schemas", "{}"))
+        tool_schemas = json.dumps(schemas_dict.get("modeling", []), indent=2)
+    except json.JSONDecodeError:
+        tool_schemas = "No tools provided."
     model_path = state.get("model_path", "No current model exists.")
 
     prompt_template = init_prompt("modeling.txt")

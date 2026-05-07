@@ -43,7 +43,7 @@ from sklearn.metrics import (
 )
 
 class ModellingTools:
-    MODEL_DIR = "models"
+    MODEL_DIR = "models_"
     os.makedirs(MODEL_DIR, exist_ok=True)
     @staticmethod
     def save_model(model: Any, model_type: str) -> str:

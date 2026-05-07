@@ -1,6 +1,9 @@
-import asyncio
-import os
 import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import asyncio
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -12,7 +15,7 @@ from rich.traceback import install
 
 install(show_locals=False)
 
-from .graph.workflow import app
+from Autonoma.graph.workflow import app
 
 console = Console()
 
@@ -54,7 +57,6 @@ async def run_pipeline():
     }
     
     console.print()
-    
     # --- GRAPH EXECUTION ---
     server_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "server.py"))
     server_params = StdioServerParameters(

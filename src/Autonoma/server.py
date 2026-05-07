@@ -11,6 +11,7 @@
 #############################
 import sys
 import os
+import json
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import polars as pl
@@ -226,14 +227,14 @@ def create_feature(params: CreateFeatureSchema) -> str:
 @mcp.tool()
 def grid_search(params: GridSearchSchema) -> str:
     if STATE['X_train'] is not None and STATE['y_train'] is not None:
-        return str(ModellingTools.grid_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
+        return json.dumps(ModellingTools.grid_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
     else:
         return "Train dataset is not yet split. Use 'split_data' first"
     
 @mcp.tool()
 def random_search(params: RandomSearchSchema) -> str:
     if STATE['X_train'] is not None and STATE['y_train'] is not None:
-        return str(ModellingTools.random_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
+        return json.dumps(ModellingTools.random_search(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump()))
     else:
         return "Train dataset is not yet split. Use 'split_data' first"
 
@@ -242,7 +243,7 @@ def linear_models(params: LinearModelsSchema) -> str:
     if STATE['X_train'] is not None and STATE['y_train'] is not None:
         res = ModellingTools.linear_models(X_train=STATE['X_train'], y_train=STATE['y_train'], **params.model_dump())
         STATE['model_path'] = res['model_path']
-        return str(res)
+        return json.dumps(res)
     else:
         return "Train dataset is not yet split. Use 'split_data' first"
 
@@ -257,25 +258,25 @@ def tree_models(params: TreeModelsSchema) -> str:
             **params.model_dump()
         )
         STATE['model_path'] = res['model_path']
-        return str(res)
+        return json.dumps(res)
     else:
         return "Train dataset is not yet split. Use 'split_data' first"
 
 @mcp.tool()
 def eval_classification(params: EvalClassificationSchema) -> str:
     if STATE['X_test'] is not None and STATE['y_test'] is not None:
-        return str(ModellingTools.eval_classification(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
+        return json.dumps(ModellingTools.eval_classification(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
     elif STATE['X_val'] is not None and STATE['y_val'] is not None:
-        return str(ModellingTools.eval_classification(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
+        return json.dumps(ModellingTools.eval_classification(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
     else:
         return "Test dataset is not yet split. Use 'split_data' first"
 
 @mcp.tool()
 def eval_regression(params: EvalRegressionSchema) -> str:
     if STATE['X_test'] is not None and STATE['y_test'] is not None:
-        return str(ModellingTools.eval_regression(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
+        return json.dumps(ModellingTools.eval_regression(X_test=STATE['X_test'], y_test=STATE['y_test'], **params.model_dump()))
     elif STATE['X_val'] is not None and STATE['y_val'] is not None:
-        return str(ModellingTools.eval_regression(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
+        return json.dumps(ModellingTools.eval_regression(X_test=STATE['X_val'], y_test=STATE['y_val'], **params.model_dump()))
     else:
         return "Test dataset is not yet split. Use 'split_data' first"
 ############################

@@ -87,7 +87,6 @@ class ModellingTools:
         )
         grid.fit(X_train.to_numpy(), y_train.to_numpy())
         
-        # Save the best model
         model_path = ModellingTools.save_model(grid.best_estimator_, f"{model_type}_tuned")
         
         return {
@@ -113,7 +112,6 @@ class ModellingTools:
         )
         randomized.fit(X_train.to_numpy(), y_train.to_numpy())
         
-        # Save the best model
         model_path = ModellingTools.save_model(randomized.best_estimator_, f"{model_type}_tuned")
 
         return {
@@ -175,7 +173,7 @@ class ModellingTools:
                 estimator.fit(
                     X_train.to_numpy(),
                     y_train.to_numpy(),
-                    eval_set = [(X_val.to_numpy(), y_val.to_numpy())],
+                    eval_set=[(X_val.to_numpy(), y_val.to_numpy())],
                 )
             else:
                 estimator.fit(X_train.to_numpy(), y_train.to_numpy())

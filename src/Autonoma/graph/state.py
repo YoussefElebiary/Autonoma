@@ -30,5 +30,9 @@ class AutonomaState(TypedDict):
     # Modeling results for feedback
     modeling_results: str
 
+    # Quality of Life / Reporting
+    evaluation_metrics: Optional[str]
+    model_params: Optional[str]
+
     # State transfer decision
     final_decision: str

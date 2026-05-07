@@ -16,6 +16,8 @@ async def executor_node(state: AutonomaState) -> dict:
         tool_calls = json.loads(clean_output)
         observations = []
         model_path = state.get("model_path", "")
+        model_params = state.get("model_params", None)
+        evaluation_metrics = state.get("evaluation_metrics", None)
 
         for call in tool_calls:
             tool_name = call.get("tool_name")
@@ -29,8 +31,21 @@ async def executor_node(state: AutonomaState) -> dict:
 
             try:
                 result_data = json.loads(result_text)
-                if current_agent == 'modeling' and "model_path" in result_data:
-                    model_path = result_data["model_path"]
+                if current_agent == 'modeling':
+                    if "model_path" in result_data:
+                        model_path = result_data["model_path"]
+                    
+                    # Capture best params from search tools
+                    if "params" in result_data:
+                        model_params = json.dumps(result_data["params"], indent=2)
+                    # Or capture direct training params
+                    elif "params" in params:
+                         model_params = json.dumps(params["params"], indent=2)
+
+                    # Capture metrics from eval tools
+                    if any(k in result_data for k in ["accuracy", "mse", "f1", "rmse"]):
+                        evaluation_metrics = result_text
+
             except json.JSONDecodeError:
                 if "Error" in result_text or "validation error" in result_text or "failed" in result_text.lower():
                     debug_print(f"-> Tool {tool_name} failed: {result_text}")
@@ -50,7 +65,9 @@ async def executor_node(state: AutonomaState) -> dict:
         elif current_agent == 'modeling':
             return {
                 "model_path": model_path,
-                "modeling_results": formatted_result
+                "modeling_results": formatted_result,
+                "model_params": model_params,
+                "evaluation_metrics": evaluation_metrics
             }
         else:
             return {}

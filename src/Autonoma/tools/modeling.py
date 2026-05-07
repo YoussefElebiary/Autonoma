@@ -83,7 +83,6 @@ class ModellingTools:
         grid = GridSearchCV(
             estimator=ModellingTools.get_estimator(model_type),
             param_grid=params,
-            n_jobs=-1,
             cv=folds
         )
         grid.fit(X_train.to_numpy(), y_train.to_numpy())
@@ -104,7 +103,6 @@ class ModellingTools:
         randomized = RandomizedSearchCV(
             estimator=ModellingTools.get_estimator(model_type),
             param_distributions=params,
-            n_jobs=-1,
             cv=folds,
             n_iter=iters
         )

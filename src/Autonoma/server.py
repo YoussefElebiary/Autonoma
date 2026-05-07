@@ -138,7 +138,13 @@ def drop_column(params: DropColumnSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
 
-    res, STATE['df'] = PreprocessingTools.drop_column(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.drop_column(
+        STATE['df'], 
+        column=params.column,
+        X_train=STATE['X_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 
 @mcp.tool()
@@ -146,7 +152,13 @@ def fill_nulls(params: FillNullsSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'] = PreprocessingTools.fill_nulls(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.fill_nulls(
+        STATE['df'], 
+        **params.model_dump(),
+        X_train=STATE['X_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 
 @mcp.tool()
@@ -154,7 +166,13 @@ def drop_outliers(params: DropOutliersSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'] = PreprocessingTools.drop_outliers(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.drop_outliers(
+        STATE['df'], 
+        **params.model_dump(),
+        X_train=STATE['X_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 
 @mcp.tool()
@@ -162,16 +180,25 @@ def transform_column(params: TransformColumnSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'] = PreprocessingTools.transform_column(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.transform_column(
+        STATE['df'], 
+        **params.model_dump(),
+        X_train=STATE['X_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 
 @mcp.tool()
 def scale_column(params: ScaleColumnSchema) -> str:
-    if STATE['df'] is None:
-        return "No Data Loaded. Use 'init_state' first"
-    
-    if STATE['X_train'] is not None and STATE['X_test'] is not None:
-        res, STATE['X_train'], STATE['X_test'] = PreprocessingTools.scale_column(STATE['X_train'], STATE['X_test'], **params.model_dump())
+    if STATE['X_train'] is not None:
+        res, STATE['X_train'], STATE['X_test'], STATE['df'], STATE['X_val'] = PreprocessingTools.scale_column(
+            STATE['X_train'], 
+            STATE['X_test'], 
+            **params.model_dump(),
+            df=STATE['df'],
+            X_val=STATE['X_val']
+        )
         return str(res)
     else:
         return "Data has not been split. Use 'split_data' first"
@@ -181,7 +208,14 @@ def encode_categorical(params: EncodeCategoricalSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'] = PreprocessingTools.encode_categorical(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.encode_categorical(
+        STATE['df'], 
+        **params.model_dump(),
+        X_train=STATE['X_train'],
+        y_train=STATE['y_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 
 @mcp.tool()
@@ -215,7 +249,13 @@ def create_feature(params: CreateFeatureSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'] = PreprocessingTools.create_feature(STATE['df'], **params.model_dump())
+    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.create_feature(
+        STATE['df'], 
+        **params.model_dump(),
+        X_train=STATE['X_train'],
+        X_val=STATE['X_val'],
+        X_test=STATE['X_test']
+    )
     return str(res)
 #############################
 

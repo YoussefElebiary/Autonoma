@@ -26,6 +26,8 @@ RULES:
 3. Determine if the task is Classification ('_c') or Regression ('_r') based on the target column in the EDA Insights.
 4. IF CURRENT MODEL is "No current model exists.": Output a tool to train a baseline model (e.g., `linear_models` or `tree_models`).
 5. IF CURRENT MODEL is a valid path: Output a tool to evaluate that model (e.g., `eval_classification` or `eval_regression`), OR output a tuning tool like `grid_search` to improve it. You can train a new different model IF NEEDED.
+6. PARAMETER COMPLIANCE: You MUST provide all parameters marked as (REQUIRED) in the tool schemas. For example, if you call `split_data`, you MUST provide both `target` and `val_size`.
+7. DATA SPLITTING: If the Data Summary indicates that the data has not been split (no X_train/y_train), you MUST call `split_data` before attempting to train any model. If it is already split, use the current splits.
 
 OUTPUT FORMAT:
 You MUST output an array of JSON objects. Do not include markdown formatting, backticks, or conversational text. Your entire response must be parsable by Python's json.loads().

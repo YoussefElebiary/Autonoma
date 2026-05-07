@@ -15,7 +15,7 @@ async def executor_node(state: AutonomaState) -> dict:
         clean_output = match.group(1).strip() if match else sample_output.strip()
         tool_calls = json.loads(clean_output)
         observations = []
-        model_path = ""
+        model_path = state.get("model_path", "")
 
         for call in tool_calls:
             tool_name = call.get("tool_name")
@@ -27,13 +27,15 @@ async def executor_node(state: AutonomaState) -> dict:
             result_text = result.content[0].text
             observations.append(f"Result of {tool_name}:\n{result_text}")
 
-            if current_agent == 'modeling':
-                try:
-                    result_data = json.loads(result_text)
-                    if "model_path" in result_data:
-                        model_path = result_data["model_path"]
-                except json.JSONDecodeError:
-                    debug_print(f"-> Warning: Could not parse model_path from: {result_text}")
+            try:
+                result_data = json.loads(result_text)
+                if current_agent == 'modeling' and "model_path" in result_data:
+                    model_path = result_data["model_path"]
+            except json.JSONDecodeError:
+                if "Error" in result_text or "validation error" in result_text or "failed" in result_text.lower():
+                    debug_print(f"-> Tool {tool_name} failed: {result_text}")
+                else:
+                    debug_print(f"-> Tool {tool_name} returned non-JSON: {result_text[:50]}...")
 
         formatted_result = "\n\n".join(observations)
 

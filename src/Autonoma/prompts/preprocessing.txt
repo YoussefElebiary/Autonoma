@@ -18,8 +18,10 @@ RULES:
 1. Do NOT write any lines of code. You are only allowed to output JSON objects that correspond to tool calls.
 2. Address ALL the Critic's feedback if any exists.
 3. If you drop a column, ensure it is NOT the target column.
-4. DATA LEAKAGE PREVENTION: You MUST use the `split_data` tool BEFORE applying any scaling, target encoding, or KNN imputation.
+4. DATA LEAKAGE PREVENTION: You MUST use the `split_data` tool BEFORE applying ANY transformations (scaling, encoding, imputation, etc.). All subsequent transformations will be automatically applied to both the training and validation/test splits to ensure consistency and prevent leakage.
 5. Tools are executed in the exact order you provide them in the array.
+6. CLEANING STRINGS: You MUST use `drop_column` on any high-cardinality string columns that are unique identifiers or names (e.g., 'Name', 'PassengerId', 'Ticket') as they cannot be used for modeling and will cause crashes.
+7. If a column contains strings that help in the prediction process (like 'Sex'), use `encode_categorical` and then use `drop_column` to drop the original column. Do NOT use `drop_column` on the original column without encoding it first.
 
 OUTPUT FORMAT:
 You MUST output an array of JSON objects. Do not include markdown formatting, backticks, or conversational text. Your entire response must be parsable by Python's json.loads().

@@ -43,7 +43,7 @@ from sklearn.metrics import (
 )
 
 class ModellingTools:
-    MODEL_DIR = "models_"
+    MODEL_DIR = "models"
     os.makedirs(MODEL_DIR, exist_ok=True)
     @staticmethod
     def save_model(model: Any, model_type: str) -> str:
@@ -122,6 +122,8 @@ class ModellingTools:
         params: Dict[str, Any],
         fit: bool = True
     ) -> Dict[str, Any]:
+        if "fit" in params:
+            del params["fit"]
         models = {
             'linear': lambda p: LinearRegression(**p),
             'logistic': lambda p: LogisticRegression(**p),
@@ -146,6 +148,8 @@ class ModellingTools:
         params: Dict[str, Any],
         fit: bool = True
     ) -> Dict[str, Any]:
+        if "fit" in params:
+            del params["fit"]
         if 'xgb' in model and X_val is not None and y_val is not None:
             params['early_stopping_rounds'] = 5
 

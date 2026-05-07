@@ -60,6 +60,15 @@ def modeling_agent_node(state: AutonomaState) -> dict:
 
     response = llm.invoke(prompt)
 
+    clean_output = response.content.strip()
+    if clean_output == "[]":
+        debug_print("Modeling Agent signaled completion.")
+        return {
+            "sample_output": "[]",
+            "current_agent": "end_pipeline",
+            "modeling_iterations": modeling_iterations
+        }
+
     return {
         "sample_output": response.content,
         "current_agent": "modeling",

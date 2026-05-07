@@ -73,11 +73,11 @@ RULES:
    - XGBoost: Search over `n_estimators`, `learning_rate`, `max_depth`, `subsample`.
    - Logistic Regression / Ridge: Search over `C` or `alpha` (logarithmic scale: [0.01, 0.1, 1, 10]).
 5. MULTI-TURN STRATEGY: 
-   - Turn 1: Call `grid_search` or `random_search` to explore the parameter space.
-   - Turn 2: Use the results from "PREVIOUS MODELING RESULTS" to train a model with the best parameters.
-   - Final Turn: Evaluate the trained model using `eval_classification` or `eval_regression`.
-6. Determine if the task is Classification ('_c') or Regression ('_r') based on the target column in the EDA Insights.
-7. IF CURRENT MODEL is "No current model exists.": Output a tool to start a search (recommended).
-8. IF CURRENT MODEL is a valid path: Output a tool to evaluate that model.
+   - Turn 1: Call `grid_search` or `random_search`. Note: These tools AUTOMATICALLY save the best model and return its path.
+   - Turn 2: Once a `model_path` is returned, call `eval_classification` or `eval_regression` on that path.
+   - Final Turn: If the model is evaluated and you are satisfied, output an empty array `[]` to signal that the pipeline is complete.
+6. TERMINATION RULE: If `CURRENT MODEL` is a valid path AND `PREVIOUS MODELING RESULTS` shows evaluation metrics (like Accuracy or MSE) for that model, you MUST output an empty array `[]` to finish the pipeline. Do NOT repeat searches or evaluations.
+7. Determine if the task is Classification ('_c') or Regression ('_r') based on the target column in the EDA Insights.
+8. IF CURRENT MODEL is "No current model exists.": Output a tool to start a search (recommended).
 9. PARAMETER COMPLIANCE: You MUST provide all parameters marked as (REQUIRED) in the tool schemas.
 10. DATA SPLITTING: If the Data Summary indicates that the data has not been split (no X_train/y_train), you MUST call `split_data` before attempting to train any model.

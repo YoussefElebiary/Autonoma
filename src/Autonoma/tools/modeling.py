@@ -86,9 +86,14 @@ class ModellingTools:
             cv=folds
         )
         grid.fit(X_train.to_numpy(), y_train.to_numpy())
+        
+        # Save the best model
+        model_path = ModellingTools.save_model(grid.best_estimator_, f"{model_type}_tuned")
+        
         return {
             "params": grid.best_params_,
-            "score": grid.best_score_
+            "score": grid.best_score_,
+            "model_path": model_path
         }
     
     @staticmethod
@@ -107,9 +112,14 @@ class ModellingTools:
             n_iter=iters
         )
         randomized.fit(X_train.to_numpy(), y_train.to_numpy())
+        
+        # Save the best model
+        model_path = ModellingTools.save_model(randomized.best_estimator_, f"{model_type}_tuned")
+
         return {
             "params": randomized.best_params_,
-            "score": randomized.best_score_
+            "score": randomized.best_score_,
+            "model_path": model_path
         }
     
     @staticmethod

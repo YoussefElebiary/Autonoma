@@ -82,7 +82,9 @@ async def init_agent_node(state: AutonomaState) -> dict:
             "data_summary": data_summary,
             "tool_schemas": tool_schemas,
             "critic_iterations": 0,
-            "critic_feedback": "None"
+            "critic_feedback": "None",
+            "modeling_iterations": 0,
+            "modeling_results": "None"
         }
     except Exception as e:
         debug_print(f"-> Initialization Error: {e}")
@@ -90,5 +92,7 @@ async def init_agent_node(state: AutonomaState) -> dict:
             "data_summary": f"FAILED TO LOAD DATA: {str(e)}",
             "tool_schemas": "FAILED TO LOAD SCHEMAS",
             "critic_iterations": 0,
-            "critic_feedback": "None"
+            "critic_feedback": "None",
+            "modeling_iterations": 0,
+            "modeling_results": "None"
         }

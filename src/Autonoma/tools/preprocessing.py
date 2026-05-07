@@ -57,7 +57,6 @@ class PreprocessingTools:
         if column not in df.columns:
             return {"error": f"Column {column} not found."}, df, X_train, X_val, X_test
         
-        # Decide which DataFrame to use for fitting (prefer X_train)
         fit_df = X_train if X_train is not None else df
         
         if method == 'median':
@@ -69,7 +68,6 @@ class PreprocessingTools:
                 return {"error": "Missing custom_val for method='custom'"}, df, X_train, X_val, X_test
             val = custom_val
         elif method == 'below':
-            # This is a local operation, can be applied independently but usually not great for splits
             df = df.with_columns(pl.col(column).backward_fill())
             if X_train is not None: X_train = X_train.with_columns(pl.col(column).backward_fill())
             if X_val is not None: X_val = X_val.with_columns(pl.col(column).backward_fill())
@@ -99,7 +97,6 @@ class PreprocessingTools:
         else:
             return {"error": f"Method {method} is invalid"}, df, X_train, X_val, X_test
 
-        # Apply simple value imputation (median/mode/custom)
         df = df.with_columns(pl.col(column).fill_null(val))
         if X_train is not None: X_train = X_train.with_columns(pl.col(column).fill_null(val))
         if X_val is not None: X_val = X_val.with_columns(pl.col(column).fill_null(val))
@@ -113,11 +110,14 @@ class PreprocessingTools:
         column: str,
         threshold: float = 3.0,
         X_train: Optional[pl.DataFrame] = None,
+        y_train: Optional[pl.DataFrame] = None,
         X_val: Optional[pl.DataFrame] = None,
-        X_test: Optional[pl.DataFrame] = None
-    ) -> Tuple[Dict[str, Any], pl.DataFrame, Optional[pl.DataFrame], Optional[pl.DataFrame], Optional[pl.DataFrame]]:
+        y_val: Optional[pl.DataFrame] = None,
+        X_test: Optional[pl.DataFrame] = None,
+        y_test: Optional[pl.DataFrame] = None
+    ) -> Tuple[Dict[str, Any], pl.DataFrame, Optional[pl.DataFrame], Optional[pl.DataFrame], Optional[pl.DataFrame], Optional[pl.DataFrame], Optional[pl.DataFrame], Optional[pl.DataFrame]]:
         if column not in df.columns:
-            return {"error": f"Column {column} not found."}, df, X_train, X_val, X_test
+            return {"error": f"Column {column} not found."}, df, X_train, y_train, X_val, y_val, X_test, y_test
         
         # Fit on X_train if available
         fit_df = X_train if X_train is not None else df
@@ -125,22 +125,28 @@ class PreprocessingTools:
         std = fit_df.get_column(column).std()
         
         if std is None or std < 1e-6:
-            return {"error": "Data has zero variance"}, df, X_train, X_val, X_test
+            return {"error": "Data has zero variance"}, df, X_train, y_train, X_val, y_val, X_test, y_test
         
-        def apply_filter(target_df):
-            if target_df is None: return None
-            return target_df.filter((pl.col(column) - mean).abs() / std <= threshold)
+        def apply_filter(target_X, target_y=None):
+            if target_X is None: return None, target_y
+            mask = (target_X.get_column(column) - mean).abs() / std <= threshold
+            target_X = target_X.filter(mask)
+            if target_y is not None:
+                target_y = target_y.filter(mask)
+            return target_X, target_y
 
-        df = apply_filter(df)
-        if X_train is not None: X_train = apply_filter(X_train)
-        if X_val is not None: X_val = apply_filter(X_val)
-        if X_test is not None: X_test = apply_filter(X_test)
+        mask_df = (df.get_column(column) - mean).abs() / std <= threshold
+        df = df.filter(mask_df)
+
+        X_train, y_train = apply_filter(X_train, y_train)
+        X_val, y_val = apply_filter(X_val, y_val)
+        X_test, y_test = apply_filter(X_test, y_test)
 
         return {
             "original_dim": fit_df.shape,
             "new_dim": df.shape,
             "threshold": threshold
-        }, df, X_train, X_val, X_test
+        }, df, X_train, y_train, X_val, y_val, X_test, y_test
     
     @staticmethod
     def transform_column(

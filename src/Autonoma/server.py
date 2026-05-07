@@ -166,12 +166,17 @@ def drop_outliers(params: DropOutliersSchema) -> str:
     if STATE['df'] is None:
         return "No Data Loaded. Use 'init_state' first"
     
-    res, STATE['df'], STATE['X_train'], STATE['X_val'], STATE['X_test'] = PreprocessingTools.drop_outliers(
+    (res, STATE['df'], STATE['X_train'], STATE['y_train'], 
+     STATE['X_val'], STATE['y_val'], 
+     STATE['X_test'], STATE['y_test']) = PreprocessingTools.drop_outliers(
         STATE['df'], 
         **params.model_dump(),
         X_train=STATE['X_train'],
+        y_train=STATE['y_train'],
         X_val=STATE['X_val'],
-        X_test=STATE['X_test']
+        y_val=STATE['y_val'],
+        X_test=STATE['X_test'],
+        y_test=STATE['y_test']
     )
     return str(res)
 

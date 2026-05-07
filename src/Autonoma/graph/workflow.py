@@ -8,6 +8,8 @@ from ..agents.modeling_node import modeling_agent_node
 from ..agents.critic_node import critic_agent_node
 from ..agents.executor_node import executor_node
 
+from ..config import MAX_MODELING_ITERATIONS
+
 def route_from_critic(state: AutonomaState) -> str:
     """Reads the final_decision and routes to the Executor or back to the Agent."""
 
@@ -35,6 +37,8 @@ def route_after_execution(state: AutonomaState) -> str:
         return "go_to_preprocessing"
     elif current_agent == "preprocessing":
         return "go_to_modeling"
+    elif current_agent == "modeling" and state.get("modeling_iterations", 0) < MAX_MODELING_ITERATIONS:
+        return "revise_modeling"
     
     return "end_pipeline"
 
@@ -81,6 +85,7 @@ workflow.add_conditional_edges(
     {
         "go_to_preprocessing": "Preprocessing",
         "go_to_modeling": "Modeling",
+        "revise_modeling": "Modeling",
         "end_pipeline": END
     }
 )

@@ -11,6 +11,9 @@ EDA INSIGHTS:
 PREPROCESSING STEPS:
 {preprocessing_steps}
 ---
+PREVIOUS MODELING RESULTS:
+{modeling_results}
+---
 CRITIC FEEDBACK (if exists):
 {critic_feedback}
 ---
@@ -20,29 +23,61 @@ AVAILABLE TOOLS:
 CURRENT MODEL:
 {model_path}
 ---
-RULES:
-1. Do NOT write any lines of code. You are only allowed to output JSON objects that correspond to tool calls.
-2. Address ALL the Critic's feedback if any exists.
-3. Determine if the task is Classification ('_c') or Regression ('_r') based on the target column in the EDA Insights.
-4. IF CURRENT MODEL is "No current model exists.": Output a tool to train a baseline model (e.g., `linear_models` or `tree_models`).
-5. IF CURRENT MODEL is a valid path: Output a tool to evaluate that model (e.g., `eval_classification` or `eval_regression`), OR output a tuning tool like `grid_search` to improve it. You can train a new different model IF NEEDED.
-6. PARAMETER COMPLIANCE: You MUST provide all parameters marked as (REQUIRED) in the tool schemas. For example, if you call `split_data`, you MUST provide both `target` and `val_size`.
-7. DATA SPLITTING: If the Data Summary indicates that the data has not been split (no X_train/y_train), you MUST call `split_data` before attempting to train any model. If it is already split, use the current splits.
+CURRENT TURN: {modeling_iterations}/{max_turns}
+---
 
 OUTPUT FORMAT:
 You MUST output an array of JSON objects. Do not include markdown formatting, backticks, or conversational text. Your entire response must be parsable by Python's json.loads().
 
-Example:
+REFERENCE EXAMPLES (Do NOT copy these exactly):
+Example 1: Starting a Grid Search
+[
+  {{
+    "tool_name": "grid_search",
+    "params": {{
+        "model_type": "forest_c",
+        "params": {{
+            "n_estimators": [50, 100, 200],
+            "max_depth": [null, 10, 20],
+            "min_samples_split": [2, 5]
+        }},
+        "folds": 5
+    }}
+  }}
+]
+
+Example 2: Training Final Model
 [
   {{
     "tool_name": "tree_models",
     "params": {{
-        "model": "decision_c",
+        "model": "forest_c",
         "params": {{
-            "max_depth": 5,
-            "min_samples_leaf": 3
+            "n_estimators": 100,
+            "max_depth": 10,
+            "min_samples_split": 2
         }},
         "fit": true
     }}
   }}
 ]
+
+---
+
+RULES:
+1. Do NOT write any lines of code. You are only allowed to output JSON objects that correspond to tool calls.
+2. Address ALL the Critic's feedback if any exists.
+3. ANTI-COPY RULE: Do NOT use the exact hyperparameters from the examples above. You MUST reason about the dataset (e.g., if it has 100,000 rows, use more trees; if it has 5 features, use smaller depths) and propose your own search space.
+4. HYPERPARAMETER GUIDANCE:
+   - Random Forest: Search over `n_estimators`, `max_depth`, `min_samples_split`.
+   - XGBoost: Search over `n_estimators`, `learning_rate`, `max_depth`, `subsample`.
+   - Logistic Regression / Ridge: Search over `C` or `alpha` (logarithmic scale: [0.01, 0.1, 1, 10]).
+5. MULTI-TURN STRATEGY: 
+   - Turn 1: Call `grid_search` or `random_search` to explore the parameter space.
+   - Turn 2: Use the results from "PREVIOUS MODELING RESULTS" to train a model with the best parameters.
+   - Final Turn: Evaluate the trained model using `eval_classification` or `eval_regression`.
+6. Determine if the task is Classification ('_c') or Regression ('_r') based on the target column in the EDA Insights.
+7. IF CURRENT MODEL is "No current model exists.": Output a tool to start a search (recommended).
+8. IF CURRENT MODEL is a valid path: Output a tool to evaluate that model.
+9. PARAMETER COMPLIANCE: You MUST provide all parameters marked as (REQUIRED) in the tool schemas.
+10. DATA SPLITTING: If the Data Summary indicates that the data has not been split (no X_train/y_train), you MUST call `split_data` before attempting to train any model.

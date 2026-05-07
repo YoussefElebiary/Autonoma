@@ -49,7 +49,8 @@ async def executor_node(state: AutonomaState) -> dict:
             }
         elif current_agent == 'modeling':
             return {
-                "model_path": model_path
+                "model_path": model_path,
+                "modeling_results": formatted_result
             }
         else:
             return {}

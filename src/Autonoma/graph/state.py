@@ -25,6 +25,10 @@ class AutonomaState(TypedDict):
     critic_feedback: str
     # Limit to critic loop feedbacks to prevent infinite loops
     critic_iterations: int
+    # Multi-turn modeling feedback loop
+    modeling_iterations: int
+    # Modeling results for feedback
+    modeling_results: str
 
     # State transfer decision
     final_decision: str

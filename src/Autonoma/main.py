@@ -15,7 +15,7 @@ from rich.traceback import install
 
 install(show_locals=False)
 
-from Autonoma.graph.workflow import app
+from autonoma.graph.workflow import app
 
 console = Console()
 

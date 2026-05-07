@@ -1,5 +1,5 @@
 # File:           server.py
-# Description:    This file conatins the MCP server logic for Autonoma
+# Description:    This file conatins the MCP server logic for autonoma
 # Author:         Youssef Elebiary
 # Date:           5/3/2026 - DD/MM/YYYY
 # Version:        1.0
@@ -22,12 +22,12 @@ from typing import (
 
 from mcp.server.fastmcp import FastMCP
 
-from Autonoma.tools.init import InitTools
-from Autonoma.tools.analysis import AnalysisTools
-from Autonoma.tools.preprocessing import PreprocessingTools
-from Autonoma.tools.modeling import ModellingTools
+from autonoma.tools.init import InitTools
+from autonoma.tools.analysis import AnalysisTools
+from autonoma.tools.preprocessing import PreprocessingTools
+from autonoma.tools.modeling import ModellingTools
 
-from Autonoma.schema.tools_io import *
+from autonoma.schema.tools_io import *
 #############################
 
 
@@ -35,7 +35,7 @@ from Autonoma.schema.tools_io import *
 #############################
 #       SERVER CONFIG       #
 #############################
-mcp = FastMCP("Autonoma-MCP-Server")
+mcp = FastMCP("autonoma-MCP-Server")
 
 STATE: Dict[str, Optional[pl.DataFrame]] = {
     "df": None,

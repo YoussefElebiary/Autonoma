@@ -4,6 +4,9 @@ Welcome to the official documentation for **Autonoma**, an autonomous machine le
 
 Autonoma is designed to handle the complexity of data science workflows by using an agentic approach. Instead of a rigid script, it employs a collection of specialized AI agents that collaborate to analyze, preprocess, and model data.
 
+### 🧠 Core Philosophy: Brain Switching
+Autonoma uses a "Brain Switching" architecture managed by LangGraph. This eliminates the need for massive context windows by passing only distilled state between agents, making it possible to run production-grade ML pipelines on **consumer hardware with limited VRAM**.
+
 ## 📚 Documentation Sections
 
 ### [Architecture](./architecture/overview.md)

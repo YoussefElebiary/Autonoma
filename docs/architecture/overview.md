@@ -19,8 +19,16 @@ A centralized state object that travels through the graph. it contains:
 - The current stage of the pipeline.
 - Feedback from the Critic.
 - Metrics and model paths.
+- **`final_decision`**: The control signal that determines the graph's path.
 
-## 🔄 The Agentic Loop
+## 🧠 "Brain Switching" Architecture
+
+A core design principle of Autonoma is **Brain Switching**. Instead of using a single LLM session with a massive, monolithic context window, the system uses LangGraph to orchestrate specialized, stateless turns.
+
+### Why this matters:
+1. **Consumer Hardware Support**: By passing only the distilled "insights" from one agent to the next, the context size remains small. This allows Autonoma to run high-quality pipelines using local models (via LM Studio) on hardware with limited VRAM.
+2. **Context Compression**: The system treats the `AutonomaState` as a living summary. The LLM never sees the raw multi-turn conversation; it only sees the current data schema and the summarized results of previous stages.
+3. **Task Specialization**: Each "Brain" (Agent) is highly focused on its specific domain (Analysis, Modeling, etc.), reducing the risk of "instruction drift" often seen in long chat sessions.
 
 The system follows a repeating pattern for each phase (Analysis, Preprocessing, Modeling):
 
@@ -28,6 +36,14 @@ The system follows a repeating pattern for each phase (Analysis, Preprocessing, 
 2. **Review**: The **Critic Agent** reviews the plan. If it's flawed, the agent must revise it.
 3. **Execute**: Once approved, the **Executor** calls the tools via the MCP server.
 4. **Reflect**: The results are fed back into the state, and the cycle continues to the next phase.
+
+## 🧠 The Role of the LLM
+
+The "intelligence" of Autonoma is externalized to the LLM. The performance of the pipeline (how well it cleans data and which models it selects) is a direct reflection of the LLM's reasoning capabilities.
+
+- **Reasoning**: Higher-tier models (GPT-4o, Claude 3.5) are better at understanding complex data distributions and identifying subtle preprocessing needs.
+- **Accuracy**: The Critic agent requires strong logic to catch errors in the tool calls proposed by other agents.
+- **Context Efficiency**: By using LangGraph state to manage data, the LLM does not need to maintain a massive conversation history. Each agent receives only the **distilled state** relevant to its task, enabling "Brain Switching" that works efficiently on consumer hardware with limited VRAM.
 
 ---
 

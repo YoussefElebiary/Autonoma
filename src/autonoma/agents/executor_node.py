@@ -53,34 +53,48 @@ async def executor_node(state: AutonomaState) -> dict:
                     debug_print(f"-> Tool {tool_name} returned non-JSON: {result_text[:50]}...")
 
         formatted_result = "\n\n".join(observations)
+        
+        # Check if any tool failed to signal a retry
+        has_error = "Error" in formatted_result or "failed" in formatted_result.lower() or "validation error" in formatted_result.lower()
+        new_iters = state.get("critic_iterations", 0) + (1 if has_error else 0)
+
+        update = {
+            "critic_iterations": new_iters,
+            "final_decision": "revise" if has_error else "approve"
+        }
 
         if current_agent == 'analysis':
-            return {
-                "eda_insights": formatted_result
-            }
+            update["eda_insights"] = formatted_result
         elif current_agent == 'preprocessing':
-            return {
-                "preprocessing_steps": formatted_result
-            }
+            update["preprocessing_steps"] = formatted_result
         elif current_agent == 'modeling':
-            return {
+            update.update({
                 "model_path": model_path,
                 "modeling_results": formatted_result,
                 "model_params": model_params,
                 "evaluation_metrics": evaluation_metrics
-            }
-        else:
-            return {}
+            })
+        
+        return update
+
     except json.JSONDecodeError:
         debug_print("-> Executor failed to parse JSON.")
-        return {}
+        return {
+            "critic_iterations": state.get("critic_iterations", 0) + 1,
+            "final_decision": "revise"
+        }
     except Exception as e:
         debug_print(f"-> MCP Execution Error: {str(e)}")
         error_msg = f"TOOL EXECUTION FAILED with error: {str(e)}"
         
+        update = {
+            "critic_iterations": state.get("critic_iterations", 0) + 1,
+            "final_decision": "revise"
+        }
+
         if current_agent == 'analysis':
-            return {"eda_insights": error_msg}
+            update["eda_insights"] = error_msg
         elif current_agent == 'preprocessing':
-            return {"preprocessing_steps": error_msg}
-        else:
-            return {}
+            update["preprocessing_steps"] = error_msg
+        
+        return update

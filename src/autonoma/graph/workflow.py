@@ -32,6 +32,12 @@ def route_after_execution(state: AutonomaState) -> str:
     """After a tool runs, figure out who the NEXT agent in the pipeline is."""
 
     current_agent = state.get("current_agent", "unknown")
+    final_decision = state.get("final_decision", "approve").lower()
+
+    if final_decision == "revise":
+        if current_agent == "analysis": return "revise_analysis"
+        if current_agent == "preprocessing": return "revise_preprocessing"
+        if current_agent == "modeling": return "revise_modeling"
 
     if current_agent == "analysis":
         return "go_to_preprocessing"
@@ -85,6 +91,8 @@ workflow.add_conditional_edges(
     {
         "go_to_preprocessing": "Preprocessing",
         "go_to_modeling": "Modeling",
+        "revise_analysis": "Analysis",
+        "revise_preprocessing": "Preprocessing",
         "revise_modeling": "Modeling",
         "end_pipeline": END
     }

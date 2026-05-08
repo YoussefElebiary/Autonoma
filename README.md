@@ -64,6 +64,8 @@ LLM_API_KEY=lm-studio
 > [!TIP]
 > You can easily switch to other providers like OpenAI, Anthropic, or Groq by updating the `LLM_BASE_URL` and `LLM_MODEL` in `src/autonoma/config.py`.
 
+> [!IMPORTANT]
+> **Performance Disclaimer**: The overall success and accuracy of the autonomous pipeline are heavily dependent on the reasoning capabilities of the LLM used. For complex datasets, models with high reasoning performance (e.g., GPT-4o, Claude 3.5 Sonnet) are recommended for both the Agent and Critic roles.
 
 ---
 

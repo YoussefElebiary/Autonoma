@@ -27,7 +27,7 @@ Autonoma/
 │   └── config.py        # Project configurations and LLM settings
 ├── models/              # Directory where trained .joblib models are saved
 ├── tests/               # Unit and integration tests
-├── docs/                # Detailed documentation (Work in progress)
+├── docs/                # Detailed documentation
 ├── Pipfile              # Dependency management
 └── README.md            # You are here
 ```
